@@ -1,0 +1,306 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ────────────────────────────────
+// ENUMS
+// ────────────────────────────────
+
+enum Role {
+  ADMIN
+  ENGINEER
+  CONSUMER
+}
+
+enum ConsumerType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+}
+
+enum BillStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+// ────────────────────────────────
+// USER
+// ────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  name      String
+  email     String   @unique
+  role      Role     @default(CONSUMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  consumer Consumer?
+
+  @@map("users")
+}
+
+
+
+model Feeder {
+  id         String @id @default(cuid())
+  feederName String @unique
+  capacityKW Float
+
+  transformers   Transformer[]
+  energyReadings FeederEnergyReading[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("feeders")
+}
+
+
+
+model FeederEnergyReading {
+  id String @id @default(cuid())
+
+  feederId String
+  feeder   Feeder @relation(fields: [feederId], references: [id], onDelete: Cascade)
+
+  energySuppliedKWh Float
+  energyBilledKWh   Float? 
+  readingDate       DateTime @default(now())
+
+  recordedBy String? // engineer/admin userId
+
+  createdAt DateTime @default(now())
+
+  @@unique([feederId, readingDate])
+  @@index([feederId, readingDate])
+  @@map("feeder_energy_readings")
+}
+
+
+
+model Transformer {
+  id              String @id @default(cuid())
+  transformerName String @unique
+  capacityKVA     Float
+  location        String
+
+  
+  currentLoadKVA Float?
+
+  feederId String
+  feeder   Feeder @relation(fields: [feederId], references: [id])
+
+  consumers Consumer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([feederId])
+  @@map("transformers")
+}
+
+// ────────────────────────────────
+// CONSUMER
+// ────────────────────────────────
+
+model Consumer {
+  id               String       @id @default(cuid())
+  consumerNumber   String       @unique
+  consumerType     ConsumerType
+  address          String
+  sanctionedLoad   Float // in kW
+  contractedDemand Float? // in kVA, mainly for COMMERCIAL/INDUSTRIAL
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  connectedTransformerId String?
+  transformer            Transformer? @relation(fields: [connectedTransformerId], references: [id])
+  
+
+  meter             Meter?
+  bills             Bill[]
+  solarPlant        SolarPlant?
+  powerFactorReadings PowerFactorReading[]
+  demandReadings      DemandReading[]
+  energyAudits        EnergyAudit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([connectedTransformerId])
+  @@map("consumers")
+}
+
+// ────────────────────────────────
+// METER
+// ────────────────────────────────
+
+model Meter {
+  id          String @id @default(cuid())
+  meterNumber String @unique
+
+  consumerId String   @unique
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  installedAt DateTime @default(now())
+  isActive    Boolean  @default(true)
+
+  readings MeterReading[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("meters")
+}
+
+// ────────────────────────────────
+// METER READING
+// ────────────────────────────────
+
+model MeterReading {
+  id String @id @default(cuid())
+
+  meterId String
+  meter   Meter @relation(fields: [meterId], references: [id], onDelete: Cascade)
+
+  reading     Float // cumulative kWh reading at time of recording
+  readingDate DateTime @default(now())
+
+  
+  peakUnits    Float?
+  dayUnits     Float?
+  offPeakUnits Float?
+
+  recordedBy String?
+
+  createdAt DateTime @default(now())
+
+  @@index([meterId, readingDate])
+  @@map("meter_readings")
+}
+
+
+model PowerFactorReading {
+  id String @id @default(cuid())
+
+  consumerId String
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  activePowerKW    Float // kW
+  reactivePowerKVAR Float // kVAR
+  powerFactor      Float // computed: kW / kVA
+  penaltyAmount    Float?  @default(0)
+
+  readingDate DateTime @default(now())
+  recordedBy  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([consumerId, readingDate])
+  @@map("power_factor_readings")
+}
+
+
+
+model DemandReading {
+  id String @id @default(cuid())
+
+  consumerId String
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  demandKW    Float
+  readingDate DateTime @default(now())
+  recordedBy  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([consumerId, readingDate])
+  @@map("demand_readings")
+}
+
+// ────────────────────────────────
+// BILL
+// ────────────────────────────────
+
+model Bill {
+  id String @id @default(cuid())
+
+  consumerId String
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  billingMonth Int // 1–12
+  billingYear  Int
+
+  unitsConsumed      Float
+  energyCharge       Float
+  fixedCharge        Float
+  demandCharge       Float @default(0)
+  powerFactorPenalty Float @default(0)
+  solarAdjustment    Float @default(0)
+  taxAmount          Float @default(0)
+  totalAmount        Float
+
+  status  BillStatus @default(PENDING)
+  dueDate DateTime?
+  paidAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([consumerId, billingYear, billingMonth])
+  @@index([consumerId, billingYear, billingMonth])
+  @@map("bills")
+}
+
+// ────────────────────────────────
+// SOLAR PLANT
+// ────────────────────────────────
+
+model SolarPlant {
+  id String @id @default(cuid())
+
+  consumerId String   @unique
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  installedCapacityKW Float
+  generatedUnits      Float    @default(0)
+  installationDate    DateTime @default(now())
+  isActive             Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("solar_plants")
+}
+
+
+
+model EnergyAudit {
+  id String @id @default(cuid())
+
+  consumerId String
+  consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
+
+  auditPeriodStart DateTime
+  auditPeriodEnd   DateTime
+
+  totalConsumptionKWh Float
+  peakDemandKW         Float
+  loadFactor           Float // avg load / peak load
+  recommendations      String? // free-text or JSON-stringified list
+
+  createdAt DateTime @default(now())
+
+  @@index([consumerId, auditPeriodStart])
+  @@map("energy_audits")
+}
