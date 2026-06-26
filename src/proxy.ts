@@ -8,10 +8,6 @@ const isPublicRoute = createRouteMatcher([
   "/unauthorized",
 ]);
 
-const isAdminOnlyRoute = createRouteMatcher([
-  "/admin/consumers/.*/delete(.*)", // example of truly admin-only sub-routes
-]);
-
 export default clerkMiddleware(async (auth, req) => {
   if (isPublicRoute(req)) return NextResponse.next();
 
@@ -25,12 +21,16 @@ export default clerkMiddleware(async (auth, req) => {
   const role = (sessionClaims?.metadata as { role?: string } | undefined)
     ?.role;
 
-  // Truly admin-only actions
-  if (isAdminOnlyRoute(req) && role !== "ADMIN") {
+  // Consumers cannot access /admin or /engineer routes
+  if (
+    req.nextUrl.pathname.startsWith("/admin") &&
+    role !== "ADMIN" &&
+    role !== "ENGINEER"
+  ) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  // /consumer routes: only CONSUMER and ADMIN
+  // Engineers and Admins cannot access /consumer routes
   if (
     req.nextUrl.pathname.startsWith("/consumer") &&
     role !== "CONSUMER" &&
