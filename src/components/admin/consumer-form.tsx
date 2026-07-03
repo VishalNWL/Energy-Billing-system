@@ -17,22 +17,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type Transformer = {
-  id: string;
-  transformerName: string;
-  feeder: { feederName: string };
-};
-
 interface ConsumerFormProps {
   defaultValues?: Partial<ConsumerFormData>;
-  transformers: Transformer[];
-  onSubmit: (data: ConsumerFormData) => Promise<{ success: boolean; errors?: Record<string, string[]> }>;
+  onSubmit: (data: ConsumerFormData) => Promise<{
+    success: boolean;
+    errors?: Record<string, string[]>;
+  }>;
   mode: "create" | "edit";
 }
 
 export function ConsumerForm({
   defaultValues,
-  transformers,
   onSubmit,
   mode,
 }: ConsumerFormProps) {
@@ -53,12 +48,10 @@ export function ConsumerForm({
   async function handleFormSubmit(data: ConsumerFormData) {
     setServerErrors({});
     const result = await onSubmit(data);
-
     if (!result.success && result.errors) {
       setServerErrors(result.errors);
       return;
     }
-
     router.push("/admin/consumers");
     router.refresh();
   }
@@ -68,7 +61,7 @@ export function ConsumerForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
 
-      {/* ── Account Details ── */}
+      {/* Account Details */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Account Details</CardTitle>
@@ -90,7 +83,7 @@ export function ConsumerForm({
         </CardContent>
       </Card>
 
-      {/* ── Connection Details ── */}
+      {/* Connection Details */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Connection Details</CardTitle>
@@ -114,7 +107,9 @@ export function ConsumerForm({
             <Label>Consumer Type</Label>
             <Select
               value={consumerType}
-              onValueChange={(v) => setValue("consumerType", v as ConsumerFormData["consumerType"])}
+              onValueChange={(v) =>
+                setValue("consumerType", v as ConsumerFormData["consumerType"])
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
@@ -136,7 +131,7 @@ export function ConsumerForm({
         </CardContent>
       </Card>
 
-      {/* ── Electrical Details ── */}
+      {/* Electrical Details */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Electrical Details</CardTitle>
@@ -167,31 +162,16 @@ export function ConsumerForm({
               {errors.contractedDemand && <p className="text-xs text-red-500">{errors.contractedDemand.message}</p>}
             </div>
           )}
-
-          <div className="space-y-1 md:col-span-2">
-            <Label>Connected Transformer</Label>
-            <Select
-              onValueChange={(v) => setValue("connectedTransformerId", v)}
-              defaultValue={defaultValues?.connectedTransformerId}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select transformer (optional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {transformers.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.transformerName} — Feeder: {t.feeder.feederName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
       </Card>
 
       <div className="flex gap-3">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : mode === "create" ? "Add Consumer" : "Save Changes"}
+          {isSubmitting
+            ? "Saving..."
+            : mode === "create"
+            ? "Add Consumer"
+            : "Save Changes"}
         </Button>
         <Button
           type="button"

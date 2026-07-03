@@ -22,9 +22,6 @@ export async function GET(
         include: {
           user: { select: { name: true, email: true } },
           meter: { select: { meterNumber: true } },
-          transformer: {
-            include: { feeder: { select: { feederName: true } } },
-          },
         },
       },
     },

@@ -86,14 +86,6 @@ export default async function ViewConsumerPage({
                 <span>{consumer.contractedDemand} kVA</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Transformer</span>
-              <span>{consumer.transformer?.transformerName ?? "Unassigned"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Feeder</span>
-              <span>{consumer.transformer?.feeder.feederName ?? "—"}</span>
-            </div>
           </CardContent>
         </Card>
 

@@ -65,15 +65,6 @@ export default async function ConsumerEnergyAuditPage({
                 label: "Meter",
                 value: consumer.meter?.meterNumber ?? "—",
               },
-              {
-                label: "Transformer",
-                value: consumer.transformer?.transformerName ?? "—",
-              },
-              {
-                label: "Feeder",
-                value:
-                  consumer.transformer?.feeder.feederName ?? "—",
-              },
             ].map(({ label, value }) => (
               <div key={label}>
                 <p className="text-xs text-muted-foreground">{label}</p>

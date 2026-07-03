@@ -12,19 +12,13 @@ export default async function EditConsumerPage({
   await requireRole(["ADMIN", "ENGINEER"]);
   const { id } = await params;
 
-  const [consumer, transformers] = await Promise.all([
-    prisma.consumer.findUnique({
-      where: { id },
-      include: {
-        user: { select: { name: true, email: true } },
-        meter: { select: { meterNumber: true } },
-      },
-    }),
-    prisma.transformer.findMany({
-      include: { feeder: { select: { feederName: true } } },
-      orderBy: { transformerName: "asc" },
-    }),
-  ]);
+  const consumer = await prisma.consumer.findUnique({
+    where: { id },
+    include: {
+      user: { select: { name: true, email: true } },
+      meter: { select: { meterNumber: true } },
+    },
+  });
 
   if (!consumer) notFound();
 
@@ -36,7 +30,6 @@ export default async function EditConsumerPage({
     address: consumer.address,
     sanctionedLoad: consumer.sanctionedLoad,
     contractedDemand: consumer.contractedDemand ?? undefined,
-    connectedTransformerId: consumer.connectedTransformerId ?? undefined,
     meterNumber: consumer.meter?.meterNumber ?? "",
   };
 
@@ -51,7 +44,6 @@ export default async function EditConsumerPage({
       <ConsumerForm
         mode="edit"
         defaultValues={defaultValues}
-        transformers={transformers}
         onSubmit={(data) => updateConsumer(id, data)}
       />
     </div>

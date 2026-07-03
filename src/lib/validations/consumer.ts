@@ -16,7 +16,6 @@ export const consumerSchema = z.object({
     .number({ error: "Must be a number" })
     .positive()
     .optional(),
-  connectedTransformerId: z.string().optional(),
   meterNumber: z
     .string()
     .min(4, "Meter number must be at least 4 characters")

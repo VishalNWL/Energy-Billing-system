@@ -7,15 +7,11 @@ export async function getAdminDashboardStats() {
 
   const [
     totalConsumers,
-    totalTransformers,
-    totalFeeders,
     totalSolarUsers,
     revenueAgg,
     consumerTypeBreakdown,
   ] = await Promise.all([
     prisma.consumer.count(),
-    prisma.transformer.count(),
-    prisma.feeder.count(),
     prisma.solarPlant.count({ where: { isActive: true } }),
     prisma.bill.aggregate({
       _sum: { totalAmount: true },
@@ -29,8 +25,6 @@ export async function getAdminDashboardStats() {
 
   return {
     totalConsumers,
-    totalTransformers,
-    totalFeeders,
     totalSolarUsers,
     currentMonthRevenue: revenueAgg._sum.totalAmount ?? 0,
     consumerTypeBreakdown,
@@ -38,7 +32,6 @@ export async function getAdminDashboardStats() {
 }
 
 export async function getMonthlyConsumptionTrend() {
-  // Last 6 months of total units consumed, grouped by month/year
   const bills = await prisma.bill.groupBy({
     by: ["billingYear", "billingMonth"],
     _sum: { unitsConsumed: true, totalAmount: true },
@@ -46,8 +39,8 @@ export async function getMonthlyConsumptionTrend() {
   });
 
   const monthNames = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec",
   ];
 
   return bills.slice(-6).map((b) => ({

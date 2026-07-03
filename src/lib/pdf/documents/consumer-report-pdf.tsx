@@ -21,10 +21,6 @@ interface ConsumerReportProps {
     contractedDemand: number | null;
     user: { name: string; email: string };
     meter: { meterNumber: string; isActive: boolean } | null;
-    transformer: {
-      transformerName: string;
-      feeder: { feederName: string };
-    } | null;
     solarPlant: { installedCapacityKW: number; generatedUnits: number } | null;
     bills: {
       billingMonth: number;
@@ -99,14 +95,6 @@ export function ConsumerReportPDF({
           <View style={styles.kvRow}>
             <Text style={styles.kvLabel}>Address</Text>
             <Text style={styles.kvValue}>{consumer.address}</Text>
-          </View>
-          <View style={styles.kvRow}>
-            <Text style={styles.kvLabel}>Transformer / Feeder</Text>
-            <Text style={styles.kvValue}>
-              {consumer.transformer
-                ? `${consumer.transformer.transformerName} → ${consumer.transformer.feeder.feederName}`
-                : "Unassigned"}
-            </Text>
           </View>
         </View>
 

@@ -69,9 +69,6 @@ export async function getBillById(billId: string) {
         include: {
           user: { select: { name: true, email: true } },
           meter: { select: { meterNumber: true } },
-          transformer: {
-            include: { feeder: { select: { feederName: true } } },
-          },
           solarPlant: true,
         },
       },

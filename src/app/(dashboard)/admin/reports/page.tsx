@@ -31,27 +31,6 @@ export default async function ReportsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Transformer report */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-500" />
-              Transformer Loading Report
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              System-wide transformer loading analysis including capacity utilization, overload status, and connected consumers.
-            </p>
-            <DownloadButton
-              url="/api/reports/transformers"
-              filename={`transformer-report-${new Date().toISOString().slice(0, 10)}.pdf`}
-              label="Download Transformer Report"
-              variant="default"
-            />
-          </CardContent>
-        </Card>
-
         {/* Consumer reports */}
         <Card>
           <CardHeader>

@@ -7,13 +7,9 @@ import {
   Table, TableBody, TableCell,
   TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import {
-  Zap, Users, GitBranch, Activity,
-  AlertTriangle, Plus,
-} from "lucide-react";
+import { Users, Activity, AlertTriangle, Plus } from "lucide-react";
 import Link from "next/link";
 import { calculatePowerFactor, getPFStatusConfig } from "@/lib/electrical/power-factor";
-import { calculateTransformerLoading } from "@/lib/electrical/transformer-loading";
 
 export default async function EngineerDashboard() {
   await requireRole(["ENGINEER", "ADMIN"]);
@@ -21,13 +17,11 @@ export default async function EngineerDashboard() {
   const [
     consumerCount,
     recentReadings,
-    transformers,
     latestPFReadings,
     pendingBillsCount,
   ] = await Promise.all([
     prisma.consumer.count(),
 
-    // Last 10 meter readings
     prisma.meterReading.findMany({
       orderBy: { readingDate: "desc" },
       take: 10,
@@ -42,15 +36,6 @@ export default async function EngineerDashboard() {
       },
     }),
 
-    // All transformers for loading check
-    prisma.transformer.findMany({
-      include: {
-        feeder: { select: { id: true, feederName: true } },
-        consumers: { select: { sanctionedLoad: true } },
-      },
-    }),
-
-    // Latest PF reading per consumer
     prisma.powerFactorReading.findMany({
       orderBy: { readingDate: "desc" },
       distinct: ["consumerId"],
@@ -65,26 +50,11 @@ export default async function EngineerDashboard() {
     prisma.bill.count({ where: { status: "PENDING" } }),
   ]);
 
-  // Compute transformer loading
-  const loadingResults = transformers.map((t) =>
-    calculateTransformerLoading(t)
-  );
-  const overloadedCount = loadingResults.filter(
-    (t) => t.status === "OVERLOADED"
-  ).length;
-  const highLoadCount = loadingResults.filter(
-    (t) => t.status === "HIGH_LOAD"
-  ).length;
-
-  // PF alerts
-  const poorPFReadings = latestPFReadings.filter(
-    (r) => r.powerFactor < 0.9
-  );
+  const poorPFReadings = latestPFReadings.filter((r) => r.powerFactor < 0.9);
 
   return (
     <div className="p-6 md:p-8 space-y-6">
 
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Engineer Dashboard</h1>
         <p className="text-muted-foreground">
@@ -92,42 +62,24 @@ export default async function EngineerDashboard() {
         </p>
       </div>
 
-      {/* Alerts */}
-      {(overloadedCount > 0 || poorPFReadings.length > 0) && (
-        <div className="space-y-2">
-          {overloadedCount > 0 && (
-            <Card className="border-red-200 bg-red-50 dark:bg-red-950/20">
-              <CardContent className="pt-4 flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
-                <p className="text-red-700 dark:text-red-300 text-sm font-medium">
-                  {overloadedCount} transformer(s) OVERLOADED — immediate
-                  field inspection required.
-                </p>
-                <Button asChild size="sm" variant="destructive" className="ml-auto shrink-0">
-                  <Link href="/admin/transformers">View</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-          {poorPFReadings.length > 0 && (
-            <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
-              <CardContent className="pt-4 flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0" />
-                <p className="text-yellow-700 dark:text-yellow-300 text-sm">
-                  {poorPFReadings.length} consumer(s) have poor power factor
-                  (PF &lt; 0.9) — penalty charges applying.
-                </p>
-                <Button asChild size="sm" variant="outline" className="ml-auto shrink-0">
-                  <Link href="/admin/power-factor">View</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+      {/* PF alert */}
+      {poorPFReadings.length > 0 && (
+        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+          <CardContent className="pt-4 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0" />
+            <p className="text-yellow-700 dark:text-yellow-300 text-sm">
+              {poorPFReadings.length} consumer(s) have poor power factor
+              (PF &lt; 0.9) — penalty charges applying.
+            </p>
+            <Button asChild size="sm" variant="outline" className="ml-auto shrink-0">
+              <Link href="/admin/power-factor">View</Link>
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
         {[
           {
             label: "Total Consumers",
@@ -135,24 +87,6 @@ export default async function EngineerDashboard() {
             icon: Users,
             color: "text-blue-600",
             href: "/admin/consumers",
-          },
-          {
-            label: "Transformers",
-            value: `${loadingResults.length} (${overloadedCount} overloaded)`,
-            icon: Zap,
-            color: overloadedCount > 0 ? "text-red-600" : "text-green-600",
-            href: "/admin/transformers",
-          },
-          {
-            label: "Feeders",
-            value: loadingResults.reduce(
-              (acc, t) =>
-                acc.includes(t.feederName) ? acc : [...acc, t.feederName],
-              [] as string[]
-            ).length,
-            icon: GitBranch,
-            color: "text-blue-600",
-            href: "/admin/feeders",
           },
           {
             label: "Pending Bills",
@@ -186,7 +120,6 @@ export default async function EngineerDashboard() {
             { label: "Add Meter Reading", href: "/admin/meter-readings" },
             { label: "Record PF Reading", href: "/admin/power-factor" },
             { label: "Record Demand Reading", href: "/admin/maximum-demand" },
-            { label: "Add Feeder Reading", href: "/admin/feeders" },
             { label: "Generate Bills", href: "/admin/billing" },
             { label: "View Load Analysis", href: "/admin/load-analysis" },
           ].map(({ label, href }) => (
@@ -201,6 +134,7 @@ export default async function EngineerDashboard() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
         {/* Recent meter readings */}
         <Card>
           <CardHeader>
@@ -257,94 +191,11 @@ export default async function EngineerDashboard() {
           </CardContent>
         </Card>
 
-        {/* Transformer loading summary */}
+        {/* Power factor status */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Transformer Status</CardTitle>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/admin/transformers">View All</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Transformer</TableHead>
-                  <TableHead>Loading</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loadingResults.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="text-center text-muted-foreground py-6 text-sm"
-                    >
-                      No transformers configured.
-                    </TableCell>
-                  </TableRow>
-                )}
-                {loadingResults.map((t) => (
-                  <TableRow key={t.transformerId}>
-                    <TableCell>
-                      <div className="text-sm font-medium">
-                        {t.transformerName}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {t.feederName}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                          <div
-                            className="h-1.5 rounded-full"
-                            style={{
-                              width: `${Math.min(t.loadingPercent, 100)}%`,
-                              backgroundColor:
-                                t.status === "OVERLOADED"
-                                  ? "#dc2626"
-                                  : t.status === "HIGH_LOAD"
-                                  ? "#ca8a04"
-                                  : "#2563eb",
-                            }}
-                          />
-                        </div>
-                        <span className="text-xs font-bold">
-                          {t.loadingPercent}%
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          t.status === "OVERLOADED"
-                            ? "destructive"
-                            : t.status === "HIGH_LOAD"
-                            ? "secondary"
-                            : "default"
-                        }
-                      >
-                        {t.status.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        {/* Power factor alerts */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">
-                Power Factor Status
-              </CardTitle>
+              <CardTitle className="text-base">Power Factor Status</CardTitle>
               <Button asChild size="sm" variant="outline">
                 <Link href="/admin/power-factor">View All</Link>
               </Button>
@@ -357,17 +208,16 @@ export default async function EngineerDashboard() {
                   <TableHead>Consumer</TableHead>
                   <TableHead>kW</TableHead>
                   <TableHead>kVAR</TableHead>
-                  <TableHead>Power Factor</TableHead>
+                  <TableHead>PF</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Penalty</TableHead>
-                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {latestPFReadings.length === 0 && (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={6}
                       className="text-center text-muted-foreground py-6 text-sm"
                     >
                       No PF readings recorded yet.
@@ -396,9 +246,7 @@ export default async function EngineerDashboard() {
                         {calc.powerFactor.toFixed(3)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={config.badge}>
-                          {config.label}
-                        </Badge>
+                        <Badge variant={config.badge}>{config.label}</Badge>
                       </TableCell>
                       <TableCell>
                         {calc.penaltyPercent > 0 ? (
@@ -406,19 +254,8 @@ export default async function EngineerDashboard() {
                             {calc.penaltyPercent}%
                           </span>
                         ) : (
-                          <span className="text-green-600 text-sm">
-                            None
-                          </span>
+                          <span className="text-green-600 text-sm">None</span>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        <Button asChild size="sm" variant="outline">
-                          <Link
-                            href={`/admin/power-factor/${r.consumerId}/new`}
-                          >
-                            Add Reading
-                          </Link>
-                        </Button>
                       </TableCell>
                     </TableRow>
                   );

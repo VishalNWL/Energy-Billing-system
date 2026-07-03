@@ -65,8 +65,6 @@ export default async function BillDetailPage({
             { label: "Consumer #", value: consumer.consumerNumber },
             { label: "Meter #", value: consumer.meter?.meterNumber ?? "—" },
             { label: "Type", value: consumer.consumerType },
-            { label: "Transformer", value: consumer.transformer?.transformerName ?? "Unassigned" },
-            { label: "Feeder", value: consumer.transformer?.feeder.feederName ?? "—" },
           ].map(({ label, value }) => (
             <div key={label} className="flex justify-between border-b pb-1">
               <span className="text-muted-foreground">{label}</span>

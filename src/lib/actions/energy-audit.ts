@@ -115,9 +115,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
       },
       solarPlant: true,
       meter: { select: { meterNumber: true } },
-      transformer: {
-        include: { feeder: { select: { feederName: true } } },
-      },
     },
   });
 

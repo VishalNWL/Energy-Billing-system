@@ -24,7 +24,6 @@ export async function createConsumer(data: unknown) {
     address,
     sanctionedLoad,
     contractedDemand,
-    connectedTransformerId,
     meterNumber,
   } = parsed.data;
 
@@ -86,7 +85,6 @@ export async function createConsumer(data: unknown) {
         address,
         sanctionedLoad,
         contractedDemand: contractedDemand ?? null,
-        connectedTransformerId: connectedTransformerId || null,
         userId: dbUser!.id,
       },
     });
@@ -121,7 +119,6 @@ export async function updateConsumer(consumerId: string, data: unknown) {
     address,
     sanctionedLoad,
     contractedDemand,
-    connectedTransformerId,
     meterNumber,
   } = parsed.data;
 
@@ -158,7 +155,6 @@ export async function updateConsumer(consumerId: string, data: unknown) {
         address,
         sanctionedLoad,
         contractedDemand: contractedDemand ?? null,
-        connectedTransformerId: connectedTransformerId || null,
       },
     });
 
@@ -192,17 +188,12 @@ export async function getConsumers() {
     include: {
       user: { select: { name: true, email: true } },
       meter: { select: { meterNumber: true } },
-      transformer: {
-        select: {
-          transformerName: true,
-          feeder: { select: { feederName: true } },
-        },
-      },
       _count: { select: { bills: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 }
+
 
 export async function getConsumerById(id: string) {
   return prisma.consumer.findUnique({
@@ -210,9 +201,6 @@ export async function getConsumerById(id: string) {
     include: {
       user: { select: { name: true, email: true } },
       meter: true,
-      transformer: {
-        include: { feeder: true },
-      },
       solarPlant: true,
       bills: {
         orderBy: [{ billingYear: "desc" }, { billingMonth: "desc" }],

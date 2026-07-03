@@ -7,7 +7,6 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
-
 // ────────────────────────────────
 // ENUMS
 // ────────────────────────────────
@@ -48,66 +47,6 @@ model User {
   @@map("users")
 }
 
-
-
-model Feeder {
-  id         String @id @default(cuid())
-  feederName String @unique
-  capacityKW Float
-
-  transformers   Transformer[]
-  energyReadings FeederEnergyReading[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("feeders")
-}
-
-
-
-model FeederEnergyReading {
-  id String @id @default(cuid())
-
-  feederId String
-  feeder   Feeder @relation(fields: [feederId], references: [id], onDelete: Cascade)
-
-  energySuppliedKWh Float
-  energyBilledKWh   Float? 
-  readingDate       DateTime @default(now())
-
-  recordedBy String? // engineer/admin userId
-
-  createdAt DateTime @default(now())
-
-  @@unique([feederId, readingDate])
-  @@index([feederId, readingDate])
-  @@map("feeder_energy_readings")
-}
-
-
-
-model Transformer {
-  id              String @id @default(cuid())
-  transformerName String @unique
-  capacityKVA     Float
-  location        String
-
-  
-  currentLoadKVA Float?
-
-  feederId String
-  feeder   Feeder @relation(fields: [feederId], references: [id])
-
-  consumers Consumer[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([feederId])
-  @@map("transformers")
-}
-
 // ────────────────────────────────
 // CONSUMER
 // ────────────────────────────────
@@ -117,19 +56,15 @@ model Consumer {
   consumerNumber   String       @unique
   consumerType     ConsumerType
   address          String
-  sanctionedLoad   Float // in kW
-  contractedDemand Float? // in kVA, mainly for COMMERCIAL/INDUSTRIAL
+  sanctionedLoad   Float
+  contractedDemand Float?
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  connectedTransformerId String?
-  transformer            Transformer? @relation(fields: [connectedTransformerId], references: [id])
-  
-
-  meter             Meter?
-  bills             Bill[]
-  solarPlant        SolarPlant?
+  meter               Meter?
+  bills               Bill[]
+  solarPlant          SolarPlant?
   powerFactorReadings PowerFactorReading[]
   demandReadings      DemandReading[]
   energyAudits        EnergyAudit[]
@@ -137,7 +72,6 @@ model Consumer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([connectedTransformerId])
   @@map("consumers")
 }
 
@@ -173,10 +107,9 @@ model MeterReading {
   meterId String
   meter   Meter @relation(fields: [meterId], references: [id], onDelete: Cascade)
 
-  reading     Float // cumulative kWh reading at time of recording
+  reading     Float
   readingDate DateTime @default(now())
 
-  
   peakUnits    Float?
   dayUnits     Float?
   offPeakUnits Float?
@@ -189,6 +122,9 @@ model MeterReading {
   @@map("meter_readings")
 }
 
+// ────────────────────────────────
+// POWER FACTOR READING
+// ────────────────────────────────
 
 model PowerFactorReading {
   id String @id @default(cuid())
@@ -196,10 +132,10 @@ model PowerFactorReading {
   consumerId String
   consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
 
-  activePowerKW    Float // kW
-  reactivePowerKVAR Float // kVAR
-  powerFactor      Float // computed: kW / kVA
-  penaltyAmount    Float?  @default(0)
+  activePowerKW     Float
+  reactivePowerKVAR Float
+  powerFactor       Float
+  penaltyAmount     Float? @default(0)
 
   readingDate DateTime @default(now())
   recordedBy  String?
@@ -210,7 +146,9 @@ model PowerFactorReading {
   @@map("power_factor_readings")
 }
 
-
+// ────────────────────────────────
+// DEMAND READING
+// ────────────────────────────────
 
 model DemandReading {
   id String @id @default(cuid())
@@ -238,7 +176,7 @@ model Bill {
   consumerId String
   consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
 
-  billingMonth Int // 1–12
+  billingMonth Int
   billingYear  Int
 
   unitsConsumed      Float
@@ -275,7 +213,7 @@ model SolarPlant {
   installedCapacityKW Float
   generatedUnits      Float    @default(0)
   installationDate    DateTime @default(now())
-  isActive             Boolean @default(true)
+  isActive            Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -283,7 +221,9 @@ model SolarPlant {
   @@map("solar_plants")
 }
 
-
+// ────────────────────────────────
+// ENERGY AUDIT
+// ────────────────────────────────
 
 model EnergyAudit {
   id String @id @default(cuid())
@@ -291,13 +231,12 @@ model EnergyAudit {
   consumerId String
   consumer   Consumer @relation(fields: [consumerId], references: [id], onDelete: Cascade)
 
-  auditPeriodStart DateTime
-  auditPeriodEnd   DateTime
-
+  auditPeriodStart    DateTime
+  auditPeriodEnd      DateTime
   totalConsumptionKWh Float
-  peakDemandKW         Float
-  loadFactor           Float // avg load / peak load
-  recommendations      String? // free-text or JSON-stringified list
+  peakDemandKW        Float
+  loadFactor          Float
+  recommendations     String?
 
   createdAt DateTime @default(now())
 

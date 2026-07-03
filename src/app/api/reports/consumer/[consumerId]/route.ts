@@ -20,9 +20,6 @@ export async function GET(
     include: {
       user: { select: { name: true, email: true } },
       meter: { select: { meterNumber: true, isActive: true } },
-      transformer: {
-        include: { feeder: { select: { feederName: true } } },
-      },
       solarPlant: {
         select: { installedCapacityKW: true, generatedUnits: true },
       },

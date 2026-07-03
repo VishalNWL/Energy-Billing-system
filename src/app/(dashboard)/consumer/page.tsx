@@ -33,9 +33,6 @@ export default async function ConsumerDashboard() {
           },
         },
       },
-      transformer: {
-        include: { feeder: { select: { feederName: true } } },
-      },
       solarPlant: true,
       bills: {
         orderBy: [{ billingYear: "desc" }, { billingMonth: "desc" }],
@@ -187,9 +184,6 @@ export default async function ConsumerDashboard() {
             <p className="text-2xl font-bold">
               {consumer.sanctionedLoad} kW
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {consumer.transformer?.transformerName ?? "Unassigned"}
-            </p>
           </CardContent>
         </Card>
 
@@ -223,9 +217,7 @@ export default async function ConsumerDashboard() {
         <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           {[
             { label: "Meter Number", value: consumer.meter?.meterNumber ?? "—" },
-            { label: "Consumer Type", value: consumer.consumerType },
-            { label: "Transformer", value: consumer.transformer?.transformerName ?? "—" },
-            { label: "Feeder", value: consumer.transformer?.feeder.feederName ?? "—" },
+            { label: "Consumer Type", value: consumer.consumerType }
           ].map(({ label, value }) => (
             <div key={label}>
               <p className="text-xs text-muted-foreground">{label}</p>

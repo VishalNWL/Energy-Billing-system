@@ -1,4 +1,4 @@
-import { Users, Zap, GitBranch, Sun, IndianRupee } from "lucide-react";
+import { Users, Sun, IndianRupee } from "lucide-react";
 import { StatCard } from "@/components/admin/stat-card";
 import { ConsumptionTrendChart } from "@/components/admin/consumption-trend-chart";
 import { ConsumerTypeChart } from "@/components/admin/consumer-type-chart";
@@ -22,11 +22,11 @@ export default async function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
         <p className="text-muted-foreground">
-          System-wide overview of consumers, infrastructure, and revenue.
+          System-wide overview of consumers, billing, and revenue.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Consumers"
           value={stats.totalConsumers}
@@ -36,16 +36,6 @@ export default async function AdminDashboard() {
           title="This Month's Revenue"
           value={`₹${stats.currentMonthRevenue.toLocaleString("en-IN")}`}
           icon={IndianRupee}
-        />
-        <StatCard
-          title="Transformers"
-          value={stats.totalTransformers}
-          icon={Zap}
-        />
-        <StatCard
-          title="Feeders"
-          value={stats.totalFeeders}
-          icon={GitBranch}
         />
         <StatCard
           title="Solar Users"

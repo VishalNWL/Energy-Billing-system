@@ -84,18 +84,6 @@ export default async function ConsumersPage() {
                   <TableCell className="font-mono">
                     {c.meter?.meterNumber ?? "—"}
                   </TableCell>
-                  <TableCell>
-                    {c.transformer ? (
-                      <div>
-                        <div className="text-sm">{c.transformer.transformerName}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {c.transformer.feeder.feederName}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">Unassigned</span>
-                    )}
-                  </TableCell>
                   <TableCell>{c.sanctionedLoad} kW</TableCell>
                   <TableCell>{c._count.bills}</TableCell>
                   <TableCell>

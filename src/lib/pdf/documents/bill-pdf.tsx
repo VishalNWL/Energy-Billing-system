@@ -35,10 +35,6 @@ interface BillPDFProps {
       sanctionedLoad: number;
       user: { name: string; email: string };
       meter: { meterNumber: string } | null;
-      transformer: {
-        transformerName: string;
-        feeder: { feederName: string };
-      } | null;
     };
   };
 }
@@ -115,8 +111,6 @@ export function BillPDF({ bill }: BillPDFProps) {
               {[
                 ["Meter Number", consumer.meter?.meterNumber ?? "—"],
                 ["Sanctioned Load", `${consumer.sanctionedLoad} kW`],
-                ["Transformer", consumer.transformer?.transformerName ?? "—"],
-                ["Feeder", consumer.transformer?.feeder.feederName ?? "—"],
               ].map(([label, value]) => (
                 <View key={label} style={styles.kvRow}>
                   <Text style={styles.kvLabel}>{label}</Text>
