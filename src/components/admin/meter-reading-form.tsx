@@ -48,12 +48,10 @@ export function MeterReadingForm({
   async function handleFormSubmit(data: MeterReadingFormData) {
     setServerErrors({});
     const result = await addMeterReading(consumerId, data);
-
     if (!result.success && result.errors) {
       setServerErrors(result.errors as Record<string, string[]>);
       return;
     }
-
     router.push(`/admin/meter-readings/${consumerId}`);
     router.refresh();
   }
@@ -77,7 +75,9 @@ export function MeterReadingForm({
               {previousDate && (
                 <div>
                   <span className="text-muted-foreground">On: </span>
-                  <span>{new Date(previousDate).toLocaleDateString("en-IN")}</span>
+                  <span>
+                    {new Date(previousDate).toLocaleDateString("en-IN")}
+                  </span>
                 </div>
               )}
             </div>
@@ -115,10 +115,14 @@ export function MeterReadingForm({
               {...register("readingDate")}
             />
             {errors.readingDate && (
-              <p className="text-xs text-red-500">{errors.readingDate.message}</p>
+              <p className="text-xs text-red-500">
+                {errors.readingDate.message}
+              </p>
             )}
             {serverErrors.readingDate && (
-              <p className="text-xs text-red-500">{serverErrors.readingDate[0]}</p>
+              <p className="text-xs text-red-500">
+                {serverErrors.readingDate[0]}
+              </p>
             )}
           </div>
 
@@ -127,65 +131,12 @@ export function MeterReadingForm({
             <div className="md:col-span-2 rounded-md border border-green-200 bg-green-50 dark:bg-green-950/20 p-3">
               <p className="text-sm text-green-800 dark:text-green-300">
                 <span className="font-medium">Estimated Units Consumed: </span>
-                <span className="text-lg font-bold">{estimatedUnits.toFixed(2)} kWh</span>
+                <span className="text-lg font-bold">
+                  {estimatedUnits.toFixed(2)} kWh
+                </span>
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* ToD breakdown (optional — for smart meters, Step 9) */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Time-of-Day Breakdown{" "}
-            <span className="text-sm font-normal text-muted-foreground">
-              (optional — for smart meters)
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-1">
-            <Label htmlFor="dayUnits">Day Units — 6AM–6PM (kWh)</Label>
-            <Input
-              id="dayUnits"
-              type="number"
-              step="0.01"
-              {...register("dayUnits", { valueAsNumber: true })}
-              placeholder="e.g. 120"
-            />
-            {errors.dayUnits && (
-              <p className="text-xs text-red-500">{errors.dayUnits.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="peakUnits">Peak Units — 6PM–10PM (kWh)</Label>
-            <Input
-              id="peakUnits"
-              type="number"
-              step="0.01"
-              {...register("peakUnits", { valueAsNumber: true })}
-              placeholder="e.g. 45"
-            />
-            {errors.peakUnits && (
-              <p className="text-xs text-red-500">{errors.peakUnits.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <Label htmlFor="offPeakUnits">Off-Peak — 10PM–6AM (kWh)</Label>
-            <Input
-              id="offPeakUnits"
-              type="number"
-              step="0.01"
-              {...register("offPeakUnits", { valueAsNumber: true })}
-              placeholder="e.g. 30"
-            />
-            {errors.offPeakUnits && (
-              <p className="text-xs text-red-500">{errors.offPeakUnits.message}</p>
-            )}
-          </div>
         </CardContent>
       </Card>
 
@@ -196,7 +147,9 @@ export function MeterReadingForm({
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/admin/meter-readings/${consumerId}`)}
+          onClick={() =>
+            router.push(`/admin/meter-readings/${consumerId}`)
+          }
         >
           Cancel
         </Button>
