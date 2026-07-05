@@ -16,20 +16,18 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { createConsumer, updateConsumer } from "@/lib/actions/consumer";
 
 interface ConsumerFormProps {
   defaultValues?: Partial<ConsumerFormData>;
-  onSubmit: (data: ConsumerFormData) => Promise<{
-    success: boolean;
-    errors?: Record<string, string[]>;
-  }>;
   mode: "create" | "edit";
+  consumerId?: string; // only needed for edit mode
 }
 
 export function ConsumerForm({
   defaultValues,
-  onSubmit,
   mode,
+  consumerId,
 }: ConsumerFormProps) {
   const router = useRouter();
   const [serverErrors, setServerErrors] = useState<Record<string, string[]>>({});
@@ -47,11 +45,17 @@ export function ConsumerForm({
 
   async function handleFormSubmit(data: ConsumerFormData) {
     setServerErrors({});
-    const result = await onSubmit(data);
+
+    const result =
+      mode === "edit" && consumerId
+        ? await updateConsumer(consumerId, data)
+        : await createConsumer(data);
+
     if (!result.success && result.errors) {
-      setServerErrors(result.errors);
+      setServerErrors(result.errors as Record<string, string[]>);
       return;
     }
+
     router.push("/admin/consumers");
     router.refresh();
   }
@@ -69,16 +73,33 @@ export function ConsumerForm({
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <Label htmlFor="name">Full Name</Label>
-            <Input id="name" {...register("name")} placeholder="e.g. Rajesh Kumar" />
-            {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
-            {serverErrors.name && <p className="text-xs text-red-500">{serverErrors.name[0]}</p>}
+            <Input
+              id="name"
+              {...register("name")}
+              placeholder="e.g. Rajesh Kumar"
+            />
+            {errors.name && (
+              <p className="text-xs text-red-500">{errors.name.message}</p>
+            )}
+            {serverErrors.name && (
+              <p className="text-xs text-red-500">{serverErrors.name[0]}</p>
+            )}
           </div>
 
           <div className="space-y-1">
             <Label htmlFor="email">Email Address</Label>
-            <Input id="email" type="email" {...register("email")} placeholder="consumer@example.com" />
-            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-            {serverErrors.email && <p className="text-xs text-red-500">{serverErrors.email[0]}</p>}
+            <Input
+              id="email"
+              type="email"
+              {...register("email")}
+              placeholder="consumer@example.com"
+            />
+            {errors.email && (
+              <p className="text-xs text-red-500">{errors.email.message}</p>
+            )}
+            {serverErrors.email && (
+              <p className="text-xs text-red-500">{serverErrors.email[0]}</p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -91,16 +112,40 @@ export function ConsumerForm({
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <Label htmlFor="consumerNumber">Consumer Number</Label>
-            <Input id="consumerNumber" {...register("consumerNumber")} placeholder="e.g. RES-001" />
-            {errors.consumerNumber && <p className="text-xs text-red-500">{errors.consumerNumber.message}</p>}
-            {serverErrors.consumerNumber && <p className="text-xs text-red-500">{serverErrors.consumerNumber[0]}</p>}
+            <Input
+              id="consumerNumber"
+              {...register("consumerNumber")}
+              placeholder="e.g. RES-001"
+            />
+            {errors.consumerNumber && (
+              <p className="text-xs text-red-500">
+                {errors.consumerNumber.message}
+              </p>
+            )}
+            {serverErrors.consumerNumber && (
+              <p className="text-xs text-red-500">
+                {serverErrors.consumerNumber[0]}
+              </p>
+            )}
           </div>
 
           <div className="space-y-1">
             <Label htmlFor="meterNumber">Meter Number</Label>
-            <Input id="meterNumber" {...register("meterNumber")} placeholder="e.g. MTR-001" />
-            {errors.meterNumber && <p className="text-xs text-red-500">{errors.meterNumber.message}</p>}
-            {serverErrors.meterNumber && <p className="text-xs text-red-500">{serverErrors.meterNumber[0]}</p>}
+            <Input
+              id="meterNumber"
+              {...register("meterNumber")}
+              placeholder="e.g. MTR-001"
+            />
+            {errors.meterNumber && (
+              <p className="text-xs text-red-500">
+                {errors.meterNumber.message}
+              </p>
+            )}
+            {serverErrors.meterNumber && (
+              <p className="text-xs text-red-500">
+                {serverErrors.meterNumber[0]}
+              </p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -108,7 +153,10 @@ export function ConsumerForm({
             <Select
               value={consumerType}
               onValueChange={(v) =>
-                setValue("consumerType", v as ConsumerFormData["consumerType"])
+                setValue(
+                  "consumerType",
+                  v as ConsumerFormData["consumerType"]
+                )
               }
             >
               <SelectTrigger>
@@ -120,13 +168,23 @@ export function ConsumerForm({
                 <SelectItem value="INDUSTRIAL">Industrial</SelectItem>
               </SelectContent>
             </Select>
-            {errors.consumerType && <p className="text-xs text-red-500">{errors.consumerType.message}</p>}
+            {errors.consumerType && (
+              <p className="text-xs text-red-500">
+                {errors.consumerType.message}
+              </p>
+            )}
           </div>
 
           <div className="space-y-1">
             <Label htmlFor="address">Address</Label>
-            <Input id="address" {...register("address")} placeholder="Full address" />
-            {errors.address && <p className="text-xs text-red-500">{errors.address.message}</p>}
+            <Input
+              id="address"
+              {...register("address")}
+              placeholder="Full address"
+            />
+            {errors.address && (
+              <p className="text-xs text-red-500">{errors.address.message}</p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -146,12 +204,19 @@ export function ConsumerForm({
               {...register("sanctionedLoad", { valueAsNumber: true })}
               placeholder="e.g. 5"
             />
-            {errors.sanctionedLoad && <p className="text-xs text-red-500">{errors.sanctionedLoad.message}</p>}
+            {errors.sanctionedLoad && (
+              <p className="text-xs text-red-500">
+                {errors.sanctionedLoad.message}
+              </p>
+            )}
           </div>
 
-          {(consumerType === "COMMERCIAL" || consumerType === "INDUSTRIAL") && (
+          {(consumerType === "COMMERCIAL" ||
+            consumerType === "INDUSTRIAL") && (
             <div className="space-y-1">
-              <Label htmlFor="contractedDemand">Contracted Demand (kVA)</Label>
+              <Label htmlFor="contractedDemand">
+                Contracted Demand (kVA)
+              </Label>
               <Input
                 id="contractedDemand"
                 type="number"
@@ -159,7 +224,11 @@ export function ConsumerForm({
                 {...register("contractedDemand", { valueAsNumber: true })}
                 placeholder="e.g. 50"
               />
-              {errors.contractedDemand && <p className="text-xs text-red-500">{errors.contractedDemand.message}</p>}
+              {errors.contractedDemand && (
+                <p className="text-xs text-red-500">
+                  {errors.contractedDemand.message}
+                </p>
+              )}
             </div>
           )}
         </CardContent>

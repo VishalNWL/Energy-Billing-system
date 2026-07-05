@@ -1,6 +1,5 @@
 import { requireRole } from "@/lib/auth";
 import { ConsumerForm } from "@/components/admin/consumer-form";
-import { createConsumer } from "@/lib/actions/consumer";
 
 export default async function NewConsumerPage() {
   await requireRole(["ADMIN", "ENGINEER"]);
@@ -13,10 +12,7 @@ export default async function NewConsumerPage() {
           Register a new electricity consumer and assign a meter.
         </p>
       </div>
-      <ConsumerForm
-        mode="create"
-        onSubmit={createConsumer}
-      />
+      <ConsumerForm mode="create" />
     </div>
   );
 }

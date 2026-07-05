@@ -1,7 +1,6 @@
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ConsumerForm } from "@/components/admin/consumer-form";
-import { updateConsumer } from "@/lib/actions/consumer";
 import { notFound } from "next/navigation";
 
 export default async function EditConsumerPage({
@@ -43,8 +42,8 @@ export default async function EditConsumerPage({
       </div>
       <ConsumerForm
         mode="edit"
+        consumerId={id}
         defaultValues={defaultValues}
-        onSubmit={(data) => updateConsumer(id, data)}
       />
     </div>
   );
