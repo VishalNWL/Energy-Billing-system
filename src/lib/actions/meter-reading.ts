@@ -15,7 +15,7 @@ export async function addMeterReading(consumerId: string, data: unknown) {
     return { success: false, errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { reading, readingDate, peakUnits, dayUnits, offPeakUnits } = parsed.data;
+ const { reading, readingDate } = parsed.data;
 
   // Get the consumer's meter
   const meter = await prisma.meter.findUnique({
@@ -62,16 +62,13 @@ export async function addMeterReading(consumerId: string, data: unknown) {
   }
 
   const newReading = await prisma.meterReading.create({
-    data: {
-      meterId: meter.id,
-      reading,
-      readingDate: new Date(readingDate),
-      peakUnits: peakUnits ?? null,
-      dayUnits: dayUnits ?? null,
-      offPeakUnits: offPeakUnits ?? null,
-      recordedBy: currentUser.id,
-    },
-  });
+  data: {
+    meterId: meter.id,
+    reading,
+    readingDate: new Date(readingDate),
+    recordedBy: currentUser.id,
+  },
+});
 
   revalidatePath(`/admin/meter-readings/${consumerId}`);
   revalidatePath("/admin/meter-readings");
