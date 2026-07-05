@@ -21,20 +21,24 @@ export default clerkMiddleware(async (auth, req) => {
   const role = (sessionClaims?.metadata as { role?: string } | undefined)
     ?.role;
 
-  // Consumers cannot access /admin or /engineer routes
+  // Only block /consumer routes from non-consumers
+  // when role is explicitly known (not undefined)
   if (
-    req.nextUrl.pathname.startsWith("/admin") &&
-    role !== "ADMIN" &&
-    role !== "ENGINEER"
+    req.nextUrl.pathname.startsWith("/consumer") &&
+    role !== undefined &&
+    role !== "CONSUMER" &&
+    role !== "ADMIN"
   ) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
-  // Engineers and Admins cannot access /consumer routes
+  // Only block /admin routes from non-admin/engineer
+  // when role is explicitly known (not undefined)
   if (
-    req.nextUrl.pathname.startsWith("/consumer") &&
-    role !== "CONSUMER" &&
-    role !== "ADMIN"
+    req.nextUrl.pathname.startsWith("/admin") &&
+    role !== undefined &&
+    role !== "ADMIN" &&
+    role !== "ENGINEER"
   ) {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
