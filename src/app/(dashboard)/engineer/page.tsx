@@ -117,7 +117,7 @@ export default async function EngineerDashboard() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           {[
-            { label: "Add Meter Reading", href: "/admin/meter-readings" },
+            { label: "Add Meter Reading", href: "/admin/meter-readings/select"},
             { label: "Record PF Reading", href: "/admin/power-factor" },
             { label: "Record Demand Reading", href: "/admin/maximum-demand" },
             { label: "Generate Bills", href: "/admin/billing" },
