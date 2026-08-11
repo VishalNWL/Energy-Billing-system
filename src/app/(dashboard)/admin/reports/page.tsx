@@ -113,7 +113,7 @@ export default async function ReportsPage() {
         </Card>
 
         {/* Energy audit reports */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-purple-500" />
@@ -148,7 +148,7 @@ export default async function ReportsPage() {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

@@ -6,15 +6,13 @@ import { redirect } from "next/navigation";
 export default async function HomePage() {
   const { userId } = await auth();
 
-  // Not signed in at all → go to sign-in
+  
   if (!userId) {
     redirect("/sign-in");
   }
 
   let dbUser = await getCurrentDbUser();
 
-  // Signed in via Clerk but DB row not created yet (webhook delay)
-  // Create it on-the-fly as a fallback
   if (!dbUser) {
     const clerkUser = await currentUser();
     if (clerkUser) {
@@ -39,7 +37,6 @@ export default async function HomePage() {
     }
   }
 
-  // Still no DB user somehow → show a holding page instead of looping
   if (!dbUser) {
     return (
       <div className="flex min-h-screen items-center justify-center flex-col gap-4">
