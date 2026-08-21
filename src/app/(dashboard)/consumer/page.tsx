@@ -351,11 +351,11 @@ export default async function ConsumerDashboard() {
             filename={`consumer-report-${consumer.consumerNumber}.pdf`}
             label="Download My Report"
           />
-          {/* <DownloadButton
+          <DownloadButton
             url={`/api/reports/audit/${consumer.id}`}
             filename={`energy-audit-${consumer.consumerNumber}.pdf`}
             label="Download Energy Audit"
-          /> */}
+          />
         </CardContent>
       </Card>
     </div>

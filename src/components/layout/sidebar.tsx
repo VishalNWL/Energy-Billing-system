@@ -73,11 +73,11 @@ const adminNav: NavItem[] = [
       { label: "Register Plant", href: "/admin/solar/register" },
     ],
   },
-  // {
-  //   label: "Energy Audit",
-  //   href: "/admin/energy-audit",
-  //   icon: ClipboardList,
-  // },
+  {
+    label: "Energy Audit",
+    href: "/admin/energy-audit",
+    icon: ClipboardList,
+  },
   {
     label: "Reports",
     href: "/admin/reports",
@@ -132,11 +132,11 @@ const engineerNav: NavItem[] = [
       { label: "Register Plant", href: "/admin/solar/register" },
     ],
   },
-  // {
-  //   label: "Energy Audit",
-  //   href: "/admin/energy-audit",
-  //   icon: ClipboardList,
-  // },
+  {
+    label: "Energy Audit",
+    href: "/admin/energy-audit",
+    icon: ClipboardList,
+  },
 ];
 
 const consumerNav: NavItem[] = [
