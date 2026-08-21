@@ -23,7 +23,7 @@ export function AuditScoreCard({ score }: Props) {
     { label: "Power Factor", score: score.powerFactorScore, max: 20 },
     { label: "Solar Adoption", score: score.solarScore, max: 20 },
     { label: "Demand Management", score: score.demandScore, max: 20 },
-    { label: "Distribution Loss", score: 20 - Math.min(20, score.total - score.loadFactorScore - score.powerFactorScore - score.solarScore - score.demandScore), max: 20 },
+    { label: "Distribution Loss", score: 20 , max: 20 },
   ];
 
   return (
