@@ -89,9 +89,6 @@ export default async function ConsumerReadingHistoryPage({
                 <TableHead>Date</TableHead>
                 <TableHead>Reading (kWh)</TableHead>
                 <TableHead>Units Consumed</TableHead>
-                <TableHead>Peak (kWh)</TableHead>
-                <TableHead>Day (kWh)</TableHead>
-                <TableHead>Off-Peak (kWh)</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -133,9 +130,6 @@ export default async function ConsumerReadingHistoryPage({
                       </span>
                     )}
                   </TableCell>
-                  <TableCell>{r.peakUnits ?? "—"}</TableCell>
-                  <TableCell>{r.dayUnits ?? "—"}</TableCell>
-                  <TableCell>{r.offPeakUnits ?? "—"}</TableCell>
                   <TableCell>
                     {/* Only allow deleting the latest reading to maintain data integrity */}
                     {index === 0 ? (

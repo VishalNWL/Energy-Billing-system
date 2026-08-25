@@ -10,7 +10,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PFTrendChart } from "@/components/admin/power-factor/pf-trend-chart";
 import { PFGauge } from "@/components/admin/power-factor/pf-gauge";
 import {
   calculatePowerFactor,
@@ -112,8 +111,7 @@ export default async function ConsumerPFHistoryPage({
         </Card>
       )}
 
-      {/* Trend chart */}
-      {trendData.length > 1 && <PFTrendChart data={trendData} />}
+   
 
       {/* History table */}
       <Card>

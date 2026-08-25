@@ -68,18 +68,6 @@ export default async function ConsumerLoadAnalysisPage({
         loadFactor={data.loadFactor}
         peak={data.peak}
       />
-
-      {/* Charts */}
-      <DailyLoadChart
-        data={data.dailyLoad}
-        sanctionedLoad={data.sanctionedLoad}
-        peakDate={data.peak?.date}
-      />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <WeeklyLoadChart data={data.weeklyLoad} />
-        <MonthlyLoadChart data={data.monthlyLoad} />
-      </div>
     </div>
   );
 }

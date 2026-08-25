@@ -37,9 +37,6 @@ export default async function MeterReadingsPage() {
                 <TableHead>Meter #</TableHead>
                 <TableHead>Reading (kWh)</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Peak</TableHead>
-                <TableHead>Day</TableHead>
-                <TableHead>Off-Peak</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -66,9 +63,6 @@ export default async function MeterReadingsPage() {
                   <TableCell>
                     {new Date(r.readingDate).toLocaleDateString("en-IN")}
                   </TableCell>
-                  <TableCell>{r.peakUnits ?? "—"}</TableCell>
-                  <TableCell>{r.dayUnits ?? "—"}</TableCell>
-                  <TableCell>{r.offPeakUnits ?? "—"}</TableCell>
                   <TableCell>
                     <Button asChild size="sm" variant="outline">
                       <Link href={`/admin/meter-readings/${r.meter.consumer.id}`}>

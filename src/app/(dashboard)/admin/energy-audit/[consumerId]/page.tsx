@@ -176,10 +176,10 @@ export default async function ConsumerEnergyAuditPage({
       <AuditScoreCard score={score} />
 
       {/* Consumption chart */}
-      <AuditConsumptionChart data={monthlyConsumption} />
+      {/* <AuditConsumptionChart data={monthlyConsumption} /> */}
 
       {/* Recommendations */}
-      <RecommendationsList recommendations={recommendations} />
+      {/* <RecommendationsList recommendations={recommendations} /> */}
 
       {/* Quick links */}
       <Card>
