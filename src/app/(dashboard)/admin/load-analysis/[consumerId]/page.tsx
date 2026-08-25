@@ -68,6 +68,11 @@ export default async function ConsumerLoadAnalysisPage({
         loadFactor={data.loadFactor}
         peak={data.peak}
       />
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <MonthlyLoadChart data={data.monthlyLoad} />
+      </div>
     </div>
   );
 }
