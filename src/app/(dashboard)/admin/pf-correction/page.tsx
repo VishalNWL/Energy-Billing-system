@@ -44,7 +44,7 @@ export default async function PFCorrectionPage() {
                 <li>φ₂ = arccos(target PF)</li>
               </ul>
             </div>
-            <div>
+            {/* <div>
               <p className="font-medium mb-2">Why correct PF?</p>
               <ul className="space-y-1 text-muted-foreground text-xs">
                 <li>✓ Eliminate PF penalty charges</li>
@@ -53,7 +53,7 @@ export default async function PFCorrectionPage() {
                 <li>✓ Improve voltage profile</li>
                 <li>✓ Release transformer capacity</li>
               </ul>
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>

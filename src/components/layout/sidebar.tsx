@@ -78,11 +78,11 @@ const adminNav: NavItem[] = [
     href: "/admin/energy-audit",
     icon: ClipboardList,
   },
-  {
-    label: "Reports",
-    href: "/admin/reports",
-    icon: FileText,
-  },
+  // {
+  //   label: "Reports",
+  //   href: "/admin/reports",
+  //   icon: FileText,
+  // },
 ];
 
 const engineerNav: NavItem[] = [
