@@ -26,31 +26,56 @@ export interface PeakInfo {
 }
 
 export async function getLoadAnalysisData(consumerId: string) {
-  const meter = await prisma.meter.findUnique({
-    where: { consumerId },
+  const consumer = await prisma.consumer.findUnique({
+    where: { id: consumerId },
     include: {
-      readings: {
-        orderBy: { readingDate: "asc" },
+      user: { select: { name: true } },
+      bills: {
+        orderBy: [{ billingYear: "asc" }, { billingMonth: "asc" }],
       },
-      consumer: {
+      meter: {
         include: {
-          user: { select: { name: true } },
-          bills: {
-            orderBy: [{ billingYear: "asc" }, { billingMonth: "asc" }],
+          readings: {
+            orderBy: { readingDate: "asc" },
           },
         },
       },
     },
   });
 
-  if (!meter || meter.readings.length < 2) return null;
+  if (!consumer) return null;
+
+  const MONTH_NAMES = [
+    "Jan","Feb","Mar","Apr","May",
+    "Jun","Jul","Aug","Sep","Oct","Nov","Dec",
+  ];
+
+  const readings = consumer.meter?.readings ?? [];
+  const monthlyLoad: MonthlyLoadPoint[] = consumer.bills.map((b) => ({
+    month: `${MONTH_NAMES[b.billingMonth - 1]} ${b.billingYear}`,
+    units: b.unitsConsumed,
+    revenue: b.totalAmount,
+  }));
+
+  if (!consumer.meter || readings.length < 2) {
+    return {
+      consumer,
+      meterNumber: consumer.meter?.meterNumber ?? "Not assigned",
+      dailyLoad: [],
+      weeklyLoad: [],
+      monthlyLoad: monthlyLoad.slice(-12),
+      peak: null,
+      totalReadings: readings.length,
+      sanctionedLoad: consumer.sanctionedLoad,
+    };
+  }
 
   // ── Compute daily deltas ──
   const dailyDeltas: DailyLoadPoint[] = [];
 
-  for (let i = 1; i < meter.readings.length; i++) {
-    const current = meter.readings[i];
-    const previous = meter.readings[i - 1];
+  for (let i = 1; i < readings.length; i++) {
+    const current = readings[i];
+    const previous = readings[i - 1];
 
     const units = parseFloat(
       (current.reading - previous.reading).toFixed(2)
@@ -73,9 +98,9 @@ export async function getLoadAnalysisData(consumerId: string) {
   // ── Weekly aggregation ──
   const weeklyMap = new Map<string, number>();
 
-  for (let i = 1; i < meter.readings.length; i++) {
-    const current = meter.readings[i];
-    const previous = meter.readings[i - 1];
+  for (let i = 1; i < readings.length; i++) {
+    const current = readings[i];
+    const previous = readings[i - 1];
     const units = parseFloat(
       (current.reading - previous.reading).toFixed(2)
     );
@@ -98,18 +123,6 @@ export async function getLoadAnalysisData(consumerId: string) {
     ([week, units]) => ({ week, units: parseFloat(units.toFixed(2)) })
   );
 
-  // ── Monthly from bills (most accurate — already computed by billing engine) ──
-  const MONTH_NAMES = [
-    "Jan","Feb","Mar","Apr","May",
-    "Jun","Jul","Aug","Sep","Oct","Nov","Dec",
-  ];
-
-  const monthlyLoad: MonthlyLoadPoint[] = meter.consumer.bills.map((b) => ({
-    month: `${MONTH_NAMES[b.billingMonth - 1]} ${b.billingYear}`,
-    units: b.unitsConsumed,
-    revenue: b.totalAmount,
-  }));
-
   // ── Peak detection ──
   let peak: PeakInfo | null = null;
   if (dailyDeltas.length > 0) {
@@ -120,14 +133,14 @@ export async function getLoadAnalysisData(consumerId: string) {
   }
 
   return {
-    consumer: meter.consumer,
-    meterNumber: meter.meterNumber,
+    consumer,
+    meterNumber: consumer.meter.meterNumber,
     dailyLoad: dailyDeltas.slice(-30), // last 30 data points
     weeklyLoad: weeklyLoad.slice(-12), // last 12 weeks
     monthlyLoad: monthlyLoad.slice(-12), // last 12 months
     peak,
-    totalReadings: meter.readings.length,
-    sanctionedLoad: meter.consumer.sanctionedLoad,
+    totalReadings: readings.length,
+    sanctionedLoad: consumer.sanctionedLoad,
   };
 }
 
