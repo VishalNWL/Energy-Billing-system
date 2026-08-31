@@ -10,7 +10,6 @@ interface AuditReportProps {
   totalUnits: number;
   avgMonthlyUnits: number;
   maxDemandKW: number;
-  loadFactor: number;
   avgPF: number;
   hasSolar: boolean;
   score: AuditScore;
@@ -40,7 +39,6 @@ export function AuditReportPDF({
   totalUnits,
   avgMonthlyUnits,
   maxDemandKW,
-  loadFactor,
   avgPF,
   hasSolar,
   score,
@@ -79,7 +77,6 @@ export function AuditReportPDF({
               { label: "Total Consumption", value: `${totalUnits.toFixed(0)} kWh` },
               { label: "Avg Monthly", value: `${avgMonthlyUnits.toFixed(0)} kWh` },
               { label: "Peak Demand", value: maxDemandKW > 0 ? `${maxDemandKW} kW` : "N/A" },
-              { label: "Load Factor", value: loadFactor > 0 ? String(loadFactor) : "N/A" },
             ].map(({ label, value }) => (
               <View key={label} style={styles.statBox}>
                 <Text style={styles.statLabel}>{label}</Text>
@@ -112,11 +109,10 @@ export function AuditReportPDF({
               ))}
             </View>
             {[
-              { cat: "Load Factor", score: score.loadFactorScore, max: 20 },
               { cat: "Power Factor", score: score.powerFactorScore, max: 20 },
               { cat: "Solar Adoption", score: score.solarScore, max: 20 },
               { cat: "Demand Management", score: score.demandScore, max: 20 },
-              { cat: "Distribution Loss", score: Math.max(0, score.total - score.loadFactorScore - score.powerFactorScore - score.solarScore - score.demandScore), max: 20 },
+              { cat: "Distribution Loss", score: Math.max(0, score.total - score.powerFactorScore - score.solarScore - score.demandScore), max: 20 },
             ].map(({ cat, score: s, max }, i) => (
               <View key={cat} style={i % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
                 <Text style={styles.tableCell}>{cat}</Text>

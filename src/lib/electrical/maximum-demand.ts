@@ -14,7 +14,6 @@ export interface DemandAnalysis {
   maxDemandKW: number;
   avgDemandKW: number;
   minDemandKW: number;
-  loadFactor: number;
   demandCharge: number;
   excessDemandKW: number;
   excessDemandPenalty: number;
@@ -44,7 +43,6 @@ export function analyzeDemand(
       maxDemandKW: 0,
       avgDemandKW: 0,
       minDemandKW: 0,
-      loadFactor: 0,
       demandCharge: 0,
       excessDemandKW: 0,
       excessDemandPenalty: 0,
@@ -58,10 +56,6 @@ export function analyzeDemand(
   const avgDemandKW = parseFloat(
     (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2)
   );
-  const loadFactor =
-    maxDemandKW > 0
-      ? parseFloat((avgDemandKW / maxDemandKW).toFixed(3))
-      : 0;
 
   // Demand charge based on max demand
   // Convert kW to kVA assuming avg PF of 0.9 for calculation
@@ -104,7 +98,6 @@ export function analyzeDemand(
     maxDemandKW,
     avgDemandKW,
     minDemandKW,
-    loadFactor,
     demandCharge,
     excessDemandKW,
     excessDemandPenalty,

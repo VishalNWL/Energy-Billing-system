@@ -30,7 +30,7 @@ export default async function MaximumDemandPage() {
         <div>
           <h1 className="text-3xl font-bold">Maximum Demand Monitoring</h1>
           <p className="text-muted-foreground">
-            Track peak demand, load factor, and demand charges across consumers.
+            Track peak demand and demand charges across consumers.
           </p>
         </div>
       </div>
@@ -59,7 +59,6 @@ export default async function MaximumDemandPage() {
                 <TableHead>Type</TableHead>
                 <TableHead>Contracted (kW)</TableHead>
                 <TableHead>Max Demand (kW)</TableHead>
-                <TableHead>Load Factor</TableHead>
                 <TableHead>Demand Charge (₹)</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
@@ -89,19 +88,6 @@ export default async function MaximumDemandPage() {
                     {s.contractedDemand ? `${s.contractedDemand} kW` : "—"}
                   </TableCell>
                   <TableCell className="font-bold">{s.maxDemandKW} kW</TableCell>
-                  <TableCell>
-                    <span
-                      className={
-                        s.loadFactor >= 0.8
-                          ? "text-green-600 font-medium"
-                          : s.loadFactor >= 0.6
-                          ? "text-yellow-600 font-medium"
-                          : "text-red-600 font-medium"
-                      }
-                    >
-                      {s.loadFactor}
-                    </span>
-                  </TableCell>
                   <TableCell>₹{s.demandCharge.toLocaleString("en-IN")}</TableCell>
                   <TableCell>
                     {s.isExceeding ? (

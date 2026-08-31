@@ -19,11 +19,10 @@ export function AuditScoreCard({ score }: Props) {
   const config = GRADE_CONFIG[score.grade];
 
   const breakdown = [
-    { label: "Load Factor", score: score.loadFactorScore, max: 20 },
     { label: "Power Factor", score: score.powerFactorScore, max: 20 },
     { label: "Solar Adoption", score: score.solarScore, max: 20 },
     { label: "Demand Management", score: score.demandScore, max: 20 },
-    { label: "Distribution Loss", score: 20 , max: 20 },
+    { label: "Distribution Loss", score: 20, max: 20 },
   ];
 
   return (

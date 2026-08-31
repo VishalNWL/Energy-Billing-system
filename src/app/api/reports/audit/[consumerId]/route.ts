@@ -29,7 +29,6 @@ const buffer = await renderToBuffer(
     totalUnits: data.totalUnits,
     avgMonthlyUnits: data.avgMonthlyUnits,
     maxDemandKW: data.maxDemandKW,
-    loadFactor: data.loadFactor,
     avgPF: data.avgPF,
     hasSolar: data.hasSolar,
     score: data.score,

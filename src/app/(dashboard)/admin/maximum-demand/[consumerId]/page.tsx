@@ -74,14 +74,6 @@ export default async function ConsumerDemandPage({
             value: `${analysis.minDemandKW} kW`,
             color: "text-green-600",
           },
-          {
-            label: "Load Factor",
-            value: analysis.loadFactor,
-            color:
-              analysis.loadFactor >= 0.8
-                ? "text-green-600"
-                : "text-yellow-600",
-          },
         ].map(({ label, value, color }) => (
           <Card key={label}>
             <CardContent className="pt-4">

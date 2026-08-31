@@ -101,7 +101,6 @@ export default async function EnergyAuditOverviewPage() {
                 <TableHead>Type</TableHead>
                 <TableHead>Avg Monthly (kWh)</TableHead>
                 <TableHead>Peak Demand (kW)</TableHead>
-                <TableHead>Load Factor</TableHead>
                 <TableHead>Avg PF</TableHead>
                 <TableHead>Solar</TableHead>
                 <TableHead>Score</TableHead>
@@ -132,21 +131,6 @@ export default async function EnergyAuditOverviewPage() {
                   <TableCell>{a.avgMonthlyUnits} kWh</TableCell>
                   <TableCell>
                     {a.maxDemand > 0 ? `${a.maxDemand} kW` : "—"}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={
-                        a.loadFactor >= 0.8
-                          ? "text-green-600 font-medium"
-                          : a.loadFactor >= 0.6
-                          ? "text-yellow-600 font-medium"
-                          : a.loadFactor > 0
-                          ? "text-red-600 font-medium"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      {a.loadFactor > 0 ? a.loadFactor : "—"}
-                    </span>
                   </TableCell>
                   <TableCell>
                     <span

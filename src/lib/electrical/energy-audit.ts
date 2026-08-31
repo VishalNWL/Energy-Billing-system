@@ -1,5 +1,4 @@
 export interface AuditScore {
-  loadFactorScore: number;
   powerFactorScore: number;
   solarScore: number;
   demandScore: number;
@@ -17,22 +16,17 @@ export interface EnergyRecommendation {
 }
 
 export function calculateAuditScore(params: {
-  loadFactor: number;
   avgPowerFactor: number;
   hasSolar: boolean;
   isWithinContractedDemand: boolean;
   lossPercent: number;
 }): AuditScore {
   const {
-    loadFactor,
     avgPowerFactor,
     hasSolar,
     isWithinContractedDemand,
     lossPercent,
   } = params;
-
-  const loadFactorScore =
-    loadFactor >= 0.8 ? 20 : loadFactor >= 0.6 ? 15 : loadFactor >= 0.4 ? 8 : 3;
 
   const powerFactorScore =
     avgPowerFactor >= 0.95
@@ -51,7 +45,6 @@ export function calculateAuditScore(params: {
     lossPercent < 5 ? 20 : lossPercent < 10 ? 15 : lossPercent < 15 ? 8 : 3;
 
   const total =
-    loadFactorScore +
     powerFactorScore +
     solarScore +
     demandScore +
@@ -69,7 +62,6 @@ export function calculateAuditScore(params: {
       : "F";
 
   return {
-    loadFactorScore,
     powerFactorScore,
     solarScore,
     demandScore,
@@ -79,7 +71,6 @@ export function calculateAuditScore(params: {
 }
 
 export function generateRecommendations(params: {
-  loadFactor: number;
   avgPowerFactor: number;
   hasSolar: boolean;
   isWithinContractedDemand: boolean;
@@ -89,7 +80,6 @@ export function generateRecommendations(params: {
 }): EnergyRecommendation[] {
   const recommendations: EnergyRecommendation[] = [];
   const {
-    loadFactor,
     avgPowerFactor,
     hasSolar,
     isWithinContractedDemand,
@@ -119,31 +109,6 @@ export function generateRecommendations(params: {
       description: `PF of ${avgPowerFactor.toFixed(3)} is below the 0.9 threshold. 
         Consider adding capacitor banks to reach at least 0.95 PF.`,
       estimatedSavingsPercent: 8,
-    });
-  }
-
-  // Load factor recommendations
-  if (loadFactor < 0.5) {
-    recommendations.push({
-      id: "lf-poor",
-      priority: "HIGH",
-      category: "Load Management",
-      title: "Implement Load Scheduling",
-      description: `Load factor of ${loadFactor} indicates highly irregular consumption. 
-        Shift non-critical loads to off-peak hours (10PM–6AM) to flatten 
-        the load curve and reduce maximum demand charges.`,
-      estimatedSavingsPercent: 20,
-    });
-  } else if (loadFactor < 0.7) {
-    recommendations.push({
-      id: "lf-medium",
-      priority: "MEDIUM",
-      category: "Load Management",
-      title: "Optimize Load Distribution",
-      description: `Load factor of ${loadFactor} can be improved by spreading 
-        energy-intensive operations across the day rather than concentrating 
-        them in peak hours.`,
-      estimatedSavingsPercent: 10,
     });
   }
 

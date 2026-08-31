@@ -119,22 +119,6 @@ export async function getLoadAnalysisData(consumerId: string) {
     peak = { date: maxPoint.date, units: maxPoint.units, type: "daily" };
   }
 
-  // ── Load factor (from bills) ──
-  const avgMonthlyUnits =
-    monthlyLoad.length > 0
-      ? monthlyLoad.reduce((sum, m) => sum + m.units, 0) / monthlyLoad.length
-      : 0;
-
-  const maxMonthlyUnits =
-    monthlyLoad.length > 0
-      ? Math.max(...monthlyLoad.map((m) => m.units))
-      : 0;
-
-  const loadFactor =
-    maxMonthlyUnits > 0
-      ? parseFloat((avgMonthlyUnits / maxMonthlyUnits).toFixed(3))
-      : 0;
-
   return {
     consumer: meter.consumer,
     meterNumber: meter.meterNumber,
@@ -142,7 +126,6 @@ export async function getLoadAnalysisData(consumerId: string) {
     weeklyLoad: weeklyLoad.slice(-12), // last 12 weeks
     monthlyLoad: monthlyLoad.slice(-12), // last 12 months
     peak,
-    loadFactor,
     totalReadings: meter.readings.length,
     sanctionedLoad: meter.consumer.sanctionedLoad,
   };

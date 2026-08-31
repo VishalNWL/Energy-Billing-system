@@ -91,7 +91,6 @@ export async function getAllConsumersDemandSummary() {
       name: c.user.name,
       contractedDemand: c.contractedDemand,
       maxDemandKW: analysis.maxDemandKW,
-      loadFactor: analysis.loadFactor,
       isExceeding: analysis.isExceeding,
       demandCharge: analysis.demandCharge,
       readingCount: c.demandReadings.length,

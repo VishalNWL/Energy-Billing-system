@@ -65,7 +65,6 @@ export default async function ConsumerLoadAnalysisPage({
       <LoadSummaryCards
         totalReadings={data.totalReadings}
         sanctionedLoad={data.sanctionedLoad}
-        loadFactor={data.loadFactor}
         peak={data.peak}
       />
 

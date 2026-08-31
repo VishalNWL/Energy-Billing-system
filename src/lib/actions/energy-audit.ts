@@ -46,14 +46,6 @@ export async function getEnergyAuditOverview() {
     const demandValues = c.demandReadings.map((d) => d.demandKW);
     const maxDemand =
       demandValues.length > 0 ? Math.max(...demandValues) : 0;
-    const avgDemand =
-      demandValues.length > 0
-        ? demandValues.reduce((a, b) => a + b, 0) / demandValues.length
-        : 0;
-    const loadFactor =
-      maxDemand > 0
-        ? parseFloat((avgDemand / maxDemand).toFixed(3))
-        : 0;
 
     const avgPF =
       c.powerFactorReadings.length > 0
@@ -72,7 +64,6 @@ export async function getEnergyAuditOverview() {
       c.contractedDemand === null || maxDemand <= c.contractedDemand;
 
     const score = calculateAuditScore({
-      loadFactor,
       avgPowerFactor: avgPF,
       hasSolar,
       isWithinContractedDemand: isWithinDemand,
@@ -86,7 +77,6 @@ export async function getEnergyAuditOverview() {
       name: c.user.name,
       avgMonthlyUnits: parseFloat(avgMonthlyUnits.toFixed(1)),
       maxDemand,
-      loadFactor,
       avgPF,
       hasSolar,
       score,
@@ -156,10 +146,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
     demandValues.length > 0
       ? demandValues.reduce((a, b) => a + b, 0) / demandValues.length
       : 0;
-  const loadFactor =
-    maxDemandKW > 0
-      ? parseFloat((avgDemandKW / maxDemandKW).toFixed(3))
-      : 0;
 
   // Power factor analysis
   const avgPF =
@@ -181,7 +167,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
 
   // Audit score
   const score = calculateAuditScore({
-    loadFactor,
     avgPowerFactor: avgPF,
     hasSolar,
     isWithinContractedDemand: isWithinDemand,
@@ -190,7 +175,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
 
   // Recommendations
   const recommendations = generateRecommendations({
-    loadFactor,
     avgPowerFactor: avgPF,
     hasSolar,
     isWithinContractedDemand: isWithinDemand,
@@ -214,7 +198,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
       auditPeriodEnd: new Date(),
       totalConsumptionKWh: totalUnits,
       peakDemandKW: maxDemandKW,
-      loadFactor,
       recommendations: JSON.stringify(
         recommendations.map((r) => r.title)
       ),
@@ -229,7 +212,6 @@ export async function getConsumerEnergyAudit(consumerId: string) {
     avgMonthlyBill: parseFloat(avgMonthlyBill.toFixed(2)),
     maxDemandKW,
     avgDemandKW: parseFloat(avgDemandKW.toFixed(2)),
-    loadFactor,
     avgPF,
     hasSolar,
     isWithinDemand,

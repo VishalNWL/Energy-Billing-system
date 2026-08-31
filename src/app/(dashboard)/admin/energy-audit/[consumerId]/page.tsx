@@ -30,7 +30,6 @@ export default async function ConsumerEnergyAuditPage({
     avgMonthlyBill,
     maxDemandKW,
     avgDemandKW,
-    loadFactor,
     avgPF,
     hasSolar,
     monthlyConsumption,
@@ -95,24 +94,6 @@ export default async function ConsumerEnergyAuditPage({
             value: maxDemandKW > 0 ? `${maxDemandKW} kW` : "No data",
             sub: `Avg ${avgDemandKW} kW`,
             color: "text-red-600",
-          },
-          {
-            label: "Load Factor",
-            value: loadFactor > 0 ? loadFactor : "No data",
-            sub:
-              loadFactor >= 0.8
-                ? "Excellent"
-                : loadFactor >= 0.6
-                ? "Good"
-                : loadFactor > 0
-                ? "Poor"
-                : "—",
-            color:
-              loadFactor >= 0.8
-                ? "text-green-600"
-                : loadFactor >= 0.6
-                ? "text-yellow-600"
-                : "text-red-600",
           },
         ].map(({ label, value, sub, color }) => (
           <Card key={label}>

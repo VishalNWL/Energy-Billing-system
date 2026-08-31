@@ -235,7 +235,6 @@ model EnergyAudit {
   auditPeriodEnd      DateTime
   totalConsumptionKWh Float
   peakDemandKW        Float
-  loadFactor          Float
   recommendations     String?
 
   createdAt DateTime @default(now())
